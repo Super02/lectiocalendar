@@ -44,7 +44,7 @@ def getService():
 
 
 def calendarCheck():
-    print(os.environ["user"])
+    print("Updating calendar for " + os.environ["user"] + "...")
     l.authenticate(os.environ["user"], os.environ["pass"])
     schedule = l.get_schedule_for_student(os.environ["student_id"])
 
@@ -75,7 +75,7 @@ def calendarCheck():
                 print(e)
                 calendarevent = service.events().insert(
                     calendarId=calendarId, body=event).execute()
-            print(calendarevent.get('htmlLink'))
+    print("Calendar has been updated")
 
 def sched():
     print("Schedule started")
@@ -85,10 +85,10 @@ def sched():
     schedule.every().day.at("07:30").do(calendarCheck)
     schedule.every().day.at("07:40").do(calendarCheck)
     schedule.every().day.at("08:15").do(calendarCheck)
-    schedule.every().day.at("19:35").do(calendarCheck)
     while True:
         schedule.run_pending()
         time.sleep(1)
 
 if __name__ == '__main__':
+    calendarCheck()
     sched()
