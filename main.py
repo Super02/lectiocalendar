@@ -72,7 +72,6 @@ def calendarCheck():
                 calendarevent = service.events().update(
                     calendarId=calendarId, eventId=id, body=event).execute()
             except Exception as e:
-                print(e)
                 calendarevent = service.events().insert(
                     calendarId=calendarId, body=event).execute()
     print("Calendar has been updated")
