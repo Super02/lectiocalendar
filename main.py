@@ -80,11 +80,11 @@ def calendarCheck():
 def sched():
     print("Schedule started")
     schedule.every().hour.do(calendarCheck)
-    schedule.every().day.at("7:00").do(calendarCheck)
-    schedule.every().day.at("7:20").do(calendarCheck)
-    schedule.every().day.at("7:30").do(calendarCheck)
-    schedule.every().day.at("7:40").do(calendarCheck)
-    schedule.every().day.at("8:15").do(calendarCheck)
+    schedule.every().day.at("07:00").do(calendarCheck)
+    schedule.every().day.at("07:20").do(calendarCheck)
+    schedule.every().day.at("07:30").do(calendarCheck)
+    schedule.every().day.at("07:40").do(calendarCheck)
+    schedule.every().day.at("08:15").do(calendarCheck)
     schedule.every().day.at("19:35").do(calendarCheck)
     while True:
         schedule.run_pending()
