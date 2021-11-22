@@ -19,6 +19,14 @@ def getService():
     creds = None
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    else:
+        creds = Credentials(
+            token="h",
+            refresh_token=os.environ["refresh_token"],
+            token_uri=os.environ["token_uri"], 
+            client_id=os.environ["client_id"],
+            client_secret=os.environ["client_secret"],
+        )
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
