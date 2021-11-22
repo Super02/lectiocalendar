@@ -1,5 +1,5 @@
 from __future__ import print_function
-import datetime
+from datetime import date
 import os
 from lectio import Lectio
 from googleapiclient.discovery import build
@@ -52,7 +52,7 @@ def calendarCheck():
 
     for i, day in enumerate(schedule):
         for j, lesson in enumerate(day):
-            id = "lec"+str(i)+str(j)
+            id = "lec"+str(i)+str(j)+str(date.today().isocalendar()[1])
             event = {
                 'summary': (lesson.subject if lesson.subject != None else lesson.title) + (" | " + lesson.room if lesson.room != None else ""),
                 'location': lesson.room,
