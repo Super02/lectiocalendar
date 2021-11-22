@@ -7,6 +7,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from dotenv import load_dotenv
+import schedule
+import time
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -41,7 +43,7 @@ def getService():
     return build('calendar', 'v3', credentials=creds)
 
 
-def main():
+def calendarCheck():
     print(os.environ["user"])
     l.authenticate(os.environ["user"], os.environ["pass"])
     schedule = l.get_schedule_for_student(os.environ["student_id"])
@@ -75,6 +77,18 @@ def main():
                     calendarId=calendarId, body=event).execute()
             print(calendarevent.get('htmlLink'))
 
+def sched():
+    print("Schedule started")
+    schedule.every().hour.do(calendarCheck)
+    schedule.every().day.at("7:00").do(calendarCheck)
+    schedule.every().day.at("7:20").do(calendarCheck)
+    schedule.every().day.at("7:30").do(calendarCheck)
+    schedule.every().day.at("7:40").do(calendarCheck)
+    schedule.every().day.at("8:15").do(calendarCheck)
+    schedule.every().day.at("19:35").do(calendarCheck)
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
 
 if __name__ == '__main__':
-    main()
+    sched()
