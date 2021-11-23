@@ -1,47 +1,16 @@
 from __future__ import print_function
-from datetime import date
 import os
 from lectio import Lectio
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
 from dotenv import load_dotenv
 import schedule
 import time
+from gservice import getService
+from datetime import date
 
-# If modifying these scopes, delete the file token.json.
-SCOPES = ['https://www.googleapis.com/auth/calendar']
+
+load_dotenv()
 calendarId = os.environ["calendarId"]
 l = Lectio(681)
-load_dotenv()
-
-
-def getService():
-    creds = None
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-    else:
-        creds = Credentials(
-            token="h",
-            refresh_token=os.environ["refresh_token"],
-            token_uri=os.environ["token_uri"], 
-            client_id=os.environ["client_id"],
-            client_secret=os.environ["client_secret"],
-        )
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'client_secret.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
-
-    return build('calendar', 'v3', credentials=creds)
-
 
 def calendarCheck():
     print("Updating calendar for " + os.environ["user"] + "...")
@@ -50,13 +19,13 @@ def calendarCheck():
 
     service = getService()
 
-    for i, day in enumerate(schedule):
-        for j, lesson in enumerate(day):
-            id = "lec"+str(i)+str(j)+str(date.today().isocalendar()[1])
+    for j,day in enumerate(schedule):
+        for i, lesson in enumerate(day):
+            _id = "lec"+str(i)+str(j)+str(date.today().isocalendar()[1])
             event = {
                 'summary': (lesson.subject if lesson.subject != None else lesson.title) + (" | " + lesson.room if lesson.room != None else ""),
                 'location': lesson.room,
-                'description': (lesson.title + "\n" if lesson.title != None else "") + lesson.teacher,
+                'description': (lesson.title + "\n" if lesson.title != None else "") + lesson.teacher if lesson.teacher != None else "",
                 'start': {
                     'dateTime': lesson.start_time.isoformat(),
                     'timeZone': 'Europe/Copenhagen',
@@ -65,15 +34,24 @@ def calendarCheck():
                     'dateTime': lesson.end_time.isoformat(),
                     'timeZone': 'Europe/Copenhagen',
                 },
-                'id': id
+                'id': _id
             }
             try:
-                service.events().get(calendarId=calendarId, eventId=id).execute()
-                calendarevent = service.events().update(
-                    calendarId=calendarId, eventId=id, body=event).execute()
+                service.events().get(calendarId=calendarId, eventId=_id).execute()
+                service.events().update(calendarId=calendarId, eventId=_id, body=event).execute()
             except Exception as e:
-                calendarevent = service.events().insert(
-                    calendarId=calendarId, body=event).execute()
+                service.events().insert(calendarId=calendarId, body=event).execute()
+            try:
+                if(len(day)-1 == i):
+                    while True:
+                        _id = list(_id)
+                        _id[3]=str(int(_id[3])+1)
+                        _id="".join(_id)
+                        if(service.events().get(calendarId=calendarId, eventId=_id).execute()["status"] != "cancelled"):
+                            service.events().delete(calendarId=calendarId, eventId=_id).execute()
+                            print("Deleted " + _id)
+            except:
+                pass
     print("Calendar has been updated")
 
 def sched():
