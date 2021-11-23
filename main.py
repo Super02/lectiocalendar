@@ -21,7 +21,7 @@ def calendarCheck():
 
     for j,day in enumerate(schedule):
         for i, lesson in enumerate(day):
-            _id = "lec"+str(i)+str(j)+str(date.today().isocalendar()[1])
+            _id = "lec"+str(i)+str(j)+str(date.today().isocalendar()[1])+str(date.today().year)
             event = {
                 'summary': (lesson.subject if lesson.subject != None else lesson.title) + (" | " + lesson.room if lesson.room != None else ""),
                 'location': lesson.room,
