@@ -45,15 +45,14 @@ def calendarCheck():
             except Exception as e:
                 service.events().insert(calendarId=calendarId, body=event).execute()
             try:
-                if(len(day)-1 == i):
-                    while True:
-                        _id = list(_id)
-                        _id[3]=str(int(_id[3])+1)
-                        _id="".join(_id)
-                        _id = str(hex(_id))[2:]
-                        if(service.events().get(calendarId=calendarId, eventId=_id).execute()["status"] != "cancelled"):
-                            service.events().delete(calendarId=calendarId, eventId=_id).execute()
-                            print("Deleted " + _id)
+                while True:
+                    _id = list(_id)
+                    _id[3]=str(int(_id[3])+1)
+                    _id="".join(_id)
+                    _id = str(hex(_id))[2:]
+                    if(service.events().get(calendarId=calendarId, eventId=_id).execute()["status"] != "cancelled"):
+                        service.events().delete(calendarId=calendarId, eventId=_id).execute()
+                        print("Deleted " + _id)
             except:
                 pass
     print("Calendar has been updated")
