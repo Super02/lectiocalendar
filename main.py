@@ -21,6 +21,7 @@ def calendarCheck():
 
     for j,day in enumerate(schedule):
         for i, lesson in enumerate(day):
+            if(lesson.start_time == None): pass
             _id = "lec"+str(hex(i))[2:]+str(j)+str(lesson.start_time.weekday())+str(lesson.start_time.year)
             event = {
                 'summary': (lesson.subject if lesson.subject != None else lesson.title) + (" | " + lesson.room if lesson.room != None else ""),
