@@ -24,7 +24,7 @@ def calendarCheck():
             try:
                 _id = "lec"+str(hex(i))[2:]+str(j)+str(lesson.start_time.weekday())+str(lesson.start_time.year)
             except AttributeError:
-                pass
+                continue
             event = {
                 'summary': (lesson.subject if lesson.subject != None else lesson.title) + (" | " + lesson.room if lesson.room != None else ""),
                 'location': lesson.room,
