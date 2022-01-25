@@ -25,6 +25,14 @@ def calendarCheck():
                 _id = "lec"+str(hex(i))[2:]+str(j)+str(lesson.start_time.weekday())+str(lesson.start_time.year)
             except AttributeError:
                 continue
+            if(lesson.is_cancelled): 
+                try:
+                    if(service.events().get(calendarId=calendarId, eventId=_id).execute()["status"] != "cancelled"):
+                        service.events().delete(calendarId=calendarId, eventId=_id).execute()
+                        print("Deleted " + _id)
+                except:
+                    pass
+                continue
             event = {
                 'summary': (lesson.subject if lesson.subject != None else lesson.title) + (" | " + lesson.room if lesson.room != None else ""),
                 'location': lesson.room,
