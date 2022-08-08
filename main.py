@@ -18,7 +18,9 @@ reach = 14
 
 def calendarCheck():
     print("Updating calendar for " + os.environ["user"] + "...")
+    print("Authenticating...")
     l.authenticate(os.environ["user"], os.environ["pass"])
+    print("Authenticated!")
     schedule = l.get_schedule_for_student(os.environ["student_id"])
 
     service = getService()
@@ -162,4 +164,5 @@ def updateCalendar():
             addToCalendar(lesson, lesson_id)
 
 if __name__ == '__main__':
+    print("Starting scheduler")
     sched()
