@@ -14,7 +14,7 @@ load_dotenv()
 calendarId = os.environ["calendarId"]
 l = Lectio(681)
 reach = 14
-
+""" 
 def calendarCheck():
     print("Updating calendar for " + os.environ["user"] + "...")
     print("Authenticating...")
@@ -68,8 +68,7 @@ def calendarCheck():
                             service.events().delete(calendarId=calendarId, eventId=_id).execute()
                             print("Deleted " + _id)
             except:
-                pass
-    print("Calendar has been updated")
+                pass """
 
 def sched():
     print("Schedule started")
@@ -163,6 +162,7 @@ def updateCalendar():
             deleteEvent(lesson_id)
         else:
             addToCalendar(lesson, lesson_id)
+    print("Calendar has been updated")
 
 if __name__ == '__main__':
     print("Starting scheduler")
