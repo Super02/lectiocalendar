@@ -10,7 +10,6 @@ from datetime import date, timedelta
 import datetime
 import pytz
 
-
 load_dotenv()
 calendarId = os.environ["calendarId"]
 l = Lectio(681)
@@ -74,6 +73,7 @@ def calendarCheck():
 
 def sched():
     print("Schedule started")
+    updateCalendar()
     schedule.every().hour.do(updateCalendar)
     schedule.every().day.at("07:00").do(updateCalendar)
     schedule.every().day.at("07:20").do(updateCalendar)
@@ -118,7 +118,6 @@ def addToCalendar(lesson, _id):
             service.events().insert(calendarId=calendarId, body=event).execute()
         except Exception as e:
             pass
-    print(event)
 
 def deleteEvent(_id):
     service = getService()
@@ -153,7 +152,9 @@ def updateCalendar():
     end = start + timedelta(days=30)
     schedule = l.get_schedule_for_student(os.environ["student_id"], start, end)
     timestamps = []
-    for lesson in schedule:
+    for i,lesson in enumerate(schedule):
+        if(i % 10 == 0):
+            print(round(i/len(schedule)*100, 2), "% done")
         if(generateTimeID(lesson.start_time) not in timestamps):
             timestamps.append(generateTimeID(lesson.start_time))
             checkday(lesson.start_time, schedule)
