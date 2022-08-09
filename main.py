@@ -135,7 +135,7 @@ def checkday(time: datetime, schedule):
     time_min = time.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.timezone("Europe/Copenhagen")).isoformat()
     events = service.events().list(calendarId=calendarId, timeMax=time_max, timeMin=time_min, showDeleted=False).execute()["items"]
     day_schedule = [_lesson for _lesson in schedule if generateTimeID(_lesson.start_time) == generateTimeID(time)]
-    alarm = scheduler.add_job(activateAlarm, 'date', run_date=day_schedule[0].start_time.isoformat())
+    alarm = scheduler.add_job(activateAlarm, 'date', run_date=day_schedule[0].start_time.isoformat() - datetime.timedelta(minutes=75))
     alarms[time] = alarm # Add alarm to alarms dict
     for event in events:
         try:
