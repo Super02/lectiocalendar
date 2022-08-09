@@ -3,17 +3,20 @@ from operator import le
 import os
 from lectio import Lectio
 from dotenv import load_dotenv
-import schedule
+from apscheduler.schedulers.background import BackgroundScheduler
 import time
 from gservice import getService
 from datetime import date, timedelta
 import datetime
 import pytz
+import requests
 
 load_dotenv()
 calendarId = os.environ["calendarId"]
 l = Lectio(681)
 reach = 14
+alarms = {}
+scheduler = BackgroundScheduler()
 """ 
 def calendarCheck():
     print("Updating calendar for " + os.environ["user"] + "...")
@@ -70,17 +73,16 @@ def calendarCheck():
             except:
                 pass """
 
+def activateAlarm():
+    requests.get("https://api.voicemonkey.io/trigger?access_token=" + os.environ["monkey_access_token"] + "&secret_token=" + os.environ["monkey_secret_token"] + "&monkey=lectiopy")
+
 def sched():
+    scheduler.add_job(updateCalendar, 'interval', hours=1)
+    scheduler.start()
     print("Schedule started")
     updateCalendar()
-    schedule.every().hour.do(updateCalendar)
-    schedule.every().day.at("07:00").do(updateCalendar)
-    schedule.every().day.at("07:20").do(updateCalendar)
-    schedule.every().day.at("07:30").do(updateCalendar)
-    schedule.every().day.at("07:40").do(updateCalendar)
-    schedule.every().day.at("08:15").do(updateCalendar)
+    print(alarms)
     while True:
-        schedule.run_pending()
         time.sleep(1)
 
 
@@ -133,6 +135,8 @@ def checkday(time: datetime, schedule):
     time_min = time.replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=pytz.timezone("Europe/Copenhagen")).isoformat()
     events = service.events().list(calendarId=calendarId, timeMax=time_max, timeMin=time_min, showDeleted=False).execute()["items"]
     day_schedule = [_lesson for _lesson in schedule if generateTimeID(_lesson.start_time) == generateTimeID(time)]
+    alarm = scheduler.add_job(activateAlarm, 'date', run_date=day_schedule[0].start_time.isoformat())
+    alarms[time] = alarm # Add alarm to alarms dict
     for event in events:
         try:
             if(not event["description"].split("\n")[0] in [lesson.url for lesson in day_schedule] and events):
@@ -145,6 +149,7 @@ def checkday(time: datetime, schedule):
             pass
 
 def updateCalendar():
+    alarms.clear()
     l.authenticate(os.environ["user"], os.environ["pass"])
     # Define start and end time as a datetime object
     start = datetime.datetime.now() + timedelta(days=0)
@@ -162,6 +167,7 @@ def updateCalendar():
             deleteEvent(lesson_id)
         else:
             addToCalendar(lesson, lesson_id)
+
     print("Calendar has been updated")
 
 if __name__ == '__main__':
